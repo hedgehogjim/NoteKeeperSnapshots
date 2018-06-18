@@ -7,10 +7,10 @@ import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import kotlinx.android.synthetic.main.activity_items.*
 import kotlinx.android.synthetic.main.app_bar_items.*
 import kotlinx.android.synthetic.main.content_items.*
@@ -23,6 +23,14 @@ class ItemsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
 
     val noteRecyclerAdapter by lazy {
         NoteRecyclerAdapter(this)
+    }
+
+    val courseLayoutManager by lazy {
+        GridLayoutManager(this, 2)
+    }
+
+    val courseRecyclerAdapter by lazy {
+        CourseRecyclerAdapter(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +50,7 @@ class ItemsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
 
         nav_view.setNavigationItemSelectedListener(this)
 
-        displayCourses()
+        displayNotes()
     }
 
     override fun onResume() {
@@ -50,10 +58,16 @@ class ItemsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         noteRecyclerAdapter.notifyDataSetChanged()
     }
 
-    fun displayCourses() {
+    fun displayNotes() {
         recyclerItems.layoutManager = noteLayoutManager
         recyclerItems.adapter = noteRecyclerAdapter
         nav_view.menu.findItem(R.id.nav_notes).isChecked = true
+    }
+
+    fun displayCourses() {
+        recyclerItems.layoutManager = courseLayoutManager
+        recyclerItems.adapter = courseRecyclerAdapter
+        nav_view.menu.findItem(R.id.nav_courses).isChecked = true
     }
 
     override fun onBackPressed() {
@@ -74,9 +88,12 @@ class ItemsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        when (item.itemId) {
-            R.id.action_settings -> return true
-            else -> return super.onOptionsItemSelected(item)
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                showSnackbar("Display settings")
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -84,16 +101,16 @@ class ItemsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         // Handle navigation view item clicks here.
         when (item.itemId) {
             R.id.nav_notes -> {
-                // Handle the camera action
+                displayNotes()
             }
             R.id.nav_courses -> {
-
+                displayCourses()
             }
             R.id.nav_share -> {
-                handleSelection("Don't you think you've shared enough")
+                showSnackbar("Don't you think you've shared enough")
             }
             R.id.nav_send -> {
-                handleSelection("Send")
+                showSnackbar("Send")
             }
         }
 
@@ -101,10 +118,8 @@ class ItemsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         return true
     }
 
-    private fun handleSelection(message_id: String) {
-        val view = findViewById<View>(R.id.fab)
-//        val view = findViewById(R.id.list_items)
-        Snackbar.make(view, message_id, Snackbar.LENGTH_LONG).show()
+    private fun showSnackbar(message: String) {
+        Snackbar.make(recyclerItems, message, Snackbar.LENGTH_LONG).show()
     }
 
 }
