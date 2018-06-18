@@ -11,6 +11,8 @@ import kotlinx.android.synthetic.main.content_main.*
 
 class NoteActivity : AppCompatActivity() {
     private var notePosition = POSITION_NOT_SET
+    private var isNewNote = false
+    private var isCancelling = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +32,7 @@ class NoteActivity : AppCompatActivity() {
         if(notePosition != POSITION_NOT_SET)
             displayNote()
         else {
+            isNewNote = true
             DataManager.notes.add(NoteInfo())
             notePosition = DataManager.notes.lastIndex
         }
@@ -51,7 +54,7 @@ class NoteActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
+        menuInflater.inflate(R.menu.menu_note, menu)
         return true
     }
 
@@ -60,7 +63,11 @@ class NoteActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.action_cancel -> {
+                isCancelling = true
+                finish()
+                true
+            }
             R.id.action_next -> {
                 moveNext()
                 true
@@ -90,7 +97,13 @@ class NoteActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        saveNote()
+        when {
+            isCancelling -> {
+                if(isNewNote)
+                    DataManager.notes.removeAt(notePosition)
+            }
+            else -> saveNote()
+        }
     }
 
     private fun saveNote() {
