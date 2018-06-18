@@ -1,18 +1,29 @@
 package com.jwhh.notekeeper
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import kotlinx.android.synthetic.main.activity_items.*
 import kotlinx.android.synthetic.main.app_bar_items.*
+import kotlinx.android.synthetic.main.content_items.*
 
 class ItemsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+
+    val noteLayoutManager by lazy {
+        LinearLayoutManager(this)
+    }
+
+    val noteRecyclerAdapter by lazy {
+        NoteRecyclerAdapter(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,8 +31,8 @@ class ItemsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         setSupportActionBar(toolbar)
 
         fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+            val activityIntent = Intent(this, MainActivity::class.java)
+            startActivity(activityIntent)
         }
 
         val toggle = ActionBarDrawerToggle(
@@ -30,6 +41,19 @@ class ItemsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
+
+        displayCourses()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        noteRecyclerAdapter.notifyDataSetChanged()
+    }
+
+    fun displayCourses() {
+        recyclerItems.layoutManager = noteLayoutManager
+        recyclerItems.adapter = noteRecyclerAdapter
+        nav_view.menu.findItem(R.id.nav_notes).isChecked = true
     }
 
     override fun onBackPressed() {
