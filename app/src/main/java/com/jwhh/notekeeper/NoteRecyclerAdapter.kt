@@ -35,7 +35,7 @@ class NoteRecyclerAdapter(val context: Context) : RecyclerView.Adapter<NoteRecyc
 
         init {
             itemView.setOnClickListener {
-                val intent = Intent(context, MainActivity::class.java)
+                val intent = Intent(context, NoteActivity::class.java)
                 intent.putExtra(NOTE_POSITION, currentPosition)
                 context.startActivity(intent)
             }
